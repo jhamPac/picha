@@ -5,8 +5,9 @@ import "html/template"
 // New instantiates a *View type and returns it
 func New(layout string, files ...string) *View {
 	files = append(files,
-		"templates/layouts/footer.gohtml",
 		"templates/layouts/appcontainer.gohtml",
+		"templates/layouts/navbar.gohtml",
+		"templates/layouts/footer.gohtml",
 	)
 	t, err := template.ParseFiles(files...)
 	if err != nil {
