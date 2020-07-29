@@ -14,16 +14,16 @@ var contactTemplate *template.Template
 func main() {
 	var err error
 	homeTemplate, err = template.ParseFiles(
-		"views/home.gohtml",
-		"views/layouts/footer.gohtml",
+		"templates/home.gohtml",
+		"templates/layouts/footer.gohtml",
 	)
 	if err != nil {
 		panic(err)
 	}
 
 	contactTemplate, err = template.ParseFiles(
-		"views/contact.gohtml",
-		"views/layouts/footer.gohtml",
+		"templates/contact.gohtml",
+		"templates/layouts/footer.gohtml",
 	)
 	if err != nil {
 		panic(err)
