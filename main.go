@@ -12,8 +12,8 @@ var homeView *view.View
 var contactView *view.View
 
 func main() {
-	homeView = view.New("templates/home.gohtml")
-	contactView = view.New("templates/contact.gohtml")
+	homeView = view.New("appcontainer", "templates/home.gohtml")
+	contactView = view.New("appcontainer", "templates/contact.gohtml")
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
