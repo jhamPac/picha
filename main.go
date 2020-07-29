@@ -8,12 +8,12 @@ import (
 	"github.com/jhampac/picha/view"
 )
 
-var homeTemplate *view.View
-var contactTemplate *view.View
+var homeView *view.View
+var contactView *view.View
 
 func main() {
-	homeTemplate = view.New("templates/home.gohtml")
-	contactTemplate = view.New("templates/contact.gohtml")
+	homeView = view.New("templates/home.gohtml")
+	contactView = view.New("templates/contact.gohtml")
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
@@ -25,7 +25,7 @@ func main() {
 
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := homeTemplate.Template.Execute(w, nil); err != nil {
+	if err := homeView.Template.Execute(w, nil); err != nil {
 		panic(err)
 	}
 }
@@ -39,7 +39,7 @@ var h http.Handler = http.HandlerFunc(notfound)
 
 func contact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := contactTemplate.Template.Execute(w, nil); err != nil {
+	if err := contactView.Template.Execute(w, nil); err != nil {
 		panic(err)
 	}
 }
