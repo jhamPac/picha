@@ -18,8 +18,8 @@ type User struct {
 	NewView *view.View
 }
 
-// New is the handler used to sign a new user up
-func (u *User) New(w http.ResponseWriter, r *http.Request) {
+// SignUp is the handler used to sign a new user up
+func (u *User) SignUp(w http.ResponseWriter, r *http.Request) {
 	if err := u.NewView.Render(w, nil); err != nil {
 		panic(err)
 	}

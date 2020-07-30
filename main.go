@@ -22,7 +22,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
 	r.HandleFunc("/contact", contact)
-	r.HandleFunc("/signup", userController.New)
+	r.HandleFunc("/signup", userController.SignUp)
 	r.NotFoundHandler = h
 
 	http.ListenAndServe(":9000", r)
