@@ -17,12 +17,12 @@ var (
 func main() {
 	homeView = view.New("appcontainer", "templates/home.gohtml")
 	contactView = view.New("appcontainer", "templates/contact.gohtml")
-	userController := controller.NewUser()
+	userC := controller.NewUser()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
 	r.HandleFunc("/contact", contact)
-	r.HandleFunc("/signup", userController.SignUp)
+	r.HandleFunc("/signup", userC.SignUp)
 	r.NotFoundHandler = h
 
 	http.ListenAndServe(":9000", r)
