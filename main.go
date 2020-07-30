@@ -25,9 +25,7 @@ func main() {
 
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil); err != nil {
-		panic(err)
-	}
+	must(homeView.Render(w, nil))
 }
 
 func notfound(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +37,12 @@ var h http.Handler = http.HandlerFunc(notfound)
 
 func contact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := contactView.Template.ExecuteTemplate(w, contactView.Layout, nil); err != nil {
+	must(contactView.Render(w, nil))
+}
+
+// must as in error must be nil
+func must(err error) {
+	if err != nil {
 		panic(err)
 	}
 }

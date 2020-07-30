@@ -2,6 +2,7 @@ package view
 
 import (
 	"html/template"
+	"net/http"
 	"path/filepath"
 )
 
@@ -27,16 +28,21 @@ func New(layout string, files ...string) *View {
 	}
 }
 
-// View represents a view created by combining n amount of templates
-type View struct {
-	Template *template.Template
-	Layout   string
-}
-
 func layoutFiles() []string {
 	files, err := filepath.Glob(LayoutDir + "*" + TemplateExt)
 	if err != nil {
 		panic(err)
 	}
 	return files
+}
+
+// View represents a view created by combining n amount of templates
+type View struct {
+	Template *template.Template
+	Layout   string
+}
+
+// Render executes a template and writes it to io.Writer
+func (v *View) Render(w http.ResponseWriter, data interface{}) error {
+	return v.Template.ExecuteTemplate(w, v.Layout, data)
 }
