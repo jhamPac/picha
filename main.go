@@ -5,24 +5,24 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jhampac/picha/controller"
 	"github.com/jhampac/picha/view"
 )
 
 var (
 	homeView    *view.View
 	contactView *view.View
-	signupView  *view.View
 )
 
 func main() {
 	homeView = view.New("appcontainer", "templates/home.gohtml")
 	contactView = view.New("appcontainer", "templates/contact.gohtml")
-	signupView = view.New("appcontainer", "templates/signup.gohtml")
+	userController := controller.NewUser()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
 	r.HandleFunc("/contact", contact)
-	r.HandleFunc("/signup", signup)
+	r.HandleFunc("/signup", userController.New)
 	r.NotFoundHandler = h
 
 	http.ListenAndServe(":9000", r)
@@ -36,11 +36,6 @@ func home(w http.ResponseWriter, r *http.Request) {
 func contact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	must(contactView.Render(w, nil))
-}
-
-func signup(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	must(signupView.Render(w, nil))
 }
 
 func notfound(w http.ResponseWriter, r *http.Request) {
