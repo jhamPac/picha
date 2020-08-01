@@ -6,12 +6,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jhampac/picha/controller"
-	"github.com/jhampac/picha/view"
-)
-
-var (
-	homeView    *view.View
-	contactView *view.View
 )
 
 func main() {
