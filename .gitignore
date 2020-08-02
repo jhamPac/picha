@@ -22,4 +22,7 @@
 /vendor/
 /Godeps/
 
+# Misc
+exp/
+
 # End of https://www.toptal.com/developers/gitignore/api/go
