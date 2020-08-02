@@ -10,7 +10,7 @@ import (
 // NewUser instantiates and returns a *User type
 func NewUser() *User {
 	return &User{
-		NewView: view.New("appcontainer", "templates/user/new.gohtml"),
+		NewView: view.New("appcontainer", "user/new"),
 	}
 }
 
