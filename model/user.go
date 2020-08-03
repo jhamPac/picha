@@ -54,6 +54,17 @@ func (us *UserService) ByID(id uint) (*User, error) {
 	return &user, nil
 }
 
+// ByEmail queries and returns a user by the email provided
+func (us *UserService) ByEmail(email string) (*User, error) {
+	var user User
+	db := us.db.Where("email = ?", email)
+	err := first(db, &user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 // Close the db connection
 func (us *UserService) Close() error {
 	return us.db.Close()
