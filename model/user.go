@@ -59,3 +59,9 @@ func (us *UserService) ByID(id uint) (*User, error) {
 func (us *UserService) Close() error {
 	return us.db.Close()
 }
+
+// DestructiveReset tears and rebuilds the user db
+func (us *UserService) DestructiveReset() {
+	us.db.DropTableIfExists(&User{})
+	us.db.AutoMigrate(&User{})
+}
