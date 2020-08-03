@@ -87,6 +87,14 @@ func (us *UserService) Close() error {
 	return us.db.Close()
 }
 
+// AutoMigrate will attempt to automatically migrate the user table
+func (us *UserService) AutoMigrate() error {
+	if err := us.db.AutoMigrate(&User{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 // DestructiveReset tears and rebuilds the user db
 func (us *UserService) DestructiveReset() {
 	us.db.DropTableIfExists(&User{})
