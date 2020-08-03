@@ -46,18 +46,12 @@ func (us *UserService) Create(user *User) error {
 // ByID queries and returns a user by the id provided
 func (us *UserService) ByID(id uint) (*User, error) {
 	var user User
-	err := us.db.Where("id = ?", id).First(&user).Error
-
-	switch err {
-	case nil:
-		return &user, nil
-
-	case gorm.ErrRecordNotFound:
-		return nil, ErrNotFound
-
-	default:
+	db := us.db.Where("id = ?", id)
+	err := first(db, &user)
+	if err != nil {
 		return nil, err
 	}
+	return &user, nil
 }
 
 // Close the db connection
@@ -69,4 +63,12 @@ func (us *UserService) Close() error {
 func (us *UserService) DestructiveReset() {
 	us.db.DropTableIfExists(&User{})
 	us.db.AutoMigrate(&User{})
+}
+
+func first(db *gorm.DB, dst interface{}) error {
+	err := db.First(dst).Error
+	if err == gorm.ErrRecordNotFound {
+		return ErrNotFound
+	}
+	return err
 }
