@@ -19,6 +19,9 @@ type User struct {
 var (
 	// ErrNotFound is returned when a resource cannot be found
 	ErrNotFound = errors.New("model: resource not found")
+
+	// ErrInvalidID is returned when an invalid ID is provided to a method like Delete
+	ErrInvalidID = errors.New("model: ID provided was invalid")
 )
 
 // UserService is the DB abstraction layer
@@ -63,6 +66,20 @@ func (us *UserService) ByEmail(email string) (*User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+// Update will update the provided user with all of the data in the provided user object
+func (us *UserService) Update(user *User) error {
+	return us.db.Save(user).Error
+}
+
+// Delete will delete a user from the db
+func (us *UserService) Delete(id uint) error {
+	if id == 0 {
+		return ErrInvalidID
+	}
+	user := User{Model: gorm.Model{ID: id}}
+	return us.db.Delete(&user).Error
 }
 
 // Close the db connection
