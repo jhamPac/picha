@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/jinzhu/gorm"
 
+	// driver for postgres gorm
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
@@ -28,4 +29,9 @@ func NewUserService(connectionInfo string) (*UserService, error) {
 	return &UserService{
 		db: db,
 	}, nil
+}
+
+// Close the db connection
+func (us *UserService) Close() error {
+	return us.db.Close()
 }
