@@ -38,6 +38,11 @@ func NewUserService(connectionInfo string) (*UserService, error) {
 	}, nil
 }
 
+// Create a user
+func (us *UserService) Create(user *User) error {
+	return us.db.Create(user).Error
+}
+
 // ByID queries and returns a user by the id provided
 func (us *UserService) ByID(id uint) (*User, error) {
 	var user User
