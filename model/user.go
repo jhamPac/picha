@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 
 	// driver for postgres gorm
@@ -13,6 +15,11 @@ type User struct {
 	Name  string
 	Email string `gorm:"not null;unique_index"`
 }
+
+var (
+	// ErrNotFound is returned when a resource cannot be found
+	ErrNotFound = errors.New("model: resource not found")
+)
 
 // UserService is the DB abstraction layer
 type UserService struct {
@@ -29,6 +36,23 @@ func NewUserService(connectionInfo string) (*UserService, error) {
 	return &UserService{
 		db: db,
 	}, nil
+}
+
+// ByID queries and returns a user by the id provided
+func (us *UserService) ByID(id uint) (*User, error) {
+	var user User
+	err := us.db.Where("id = ?", id).First(&user).Error
+
+	switch err {
+	case nil:
+		return &user, nil
+
+	case gorm.ErrRecordNotFound:
+		return nil, ErrNotFound
+
+	default:
+		return nil, err
+	}
 }
 
 // Close the db connection
