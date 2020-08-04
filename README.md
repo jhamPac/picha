@@ -1,3 +1,3 @@
 # Picha 📸
 
-Share your photos securely
+Share your photographs securely.
