@@ -29,7 +29,7 @@ func (u *User) New(w http.ResponseWriter, r *http.Request) {
 // Create a new user by handling the request with form data
 func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 	var form SignupForm
-	if err := parseForm(r, &form); err != nil {
+	if err := parseForm(&form, r); err != nil {
 		panic(err)
 	}
 	fmt.Fprintln(w, "Name is", form.Name)
