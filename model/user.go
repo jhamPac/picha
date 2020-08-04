@@ -26,6 +26,9 @@ var (
 	// ErrInvalidID is returned when an invalid ID is provided to a method like Delete
 	ErrInvalidID = errors.New("model: ID provided was invalid")
 
+	// ErrInvalidPassword is returned when an invalid password is provided
+	ErrInvalidPassword = errors.New("model: incorrect password provided")
+
 	userPwPepper = "secret-dev-pepper"
 )
 
@@ -55,6 +58,23 @@ func (us *UserService) Create(user *User) error {
 	user.PasswordHash = string(hashedBytes)
 	user.Password = ""
 	return us.db.Create(user).Error
+}
+
+// Authenticate users into the app
+func (us *UserService) Authenticate(email, password string) (*User, error) {
+	foundUser, err := us.ByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password+userPwPepper))
+	switch err {
+	case nil:
+		return foundUser, nil
+	case bcrypt.ErrMismatchedHashAndPassword:
+		return nil, ErrInvalidPassword
+	default:
+		return nil, err
+	}
 }
 
 // ByID queries and returns a user by the id provided
