@@ -25,6 +25,8 @@ var (
 
 	// ErrInvalidID is returned when an invalid ID is provided to a method like Delete
 	ErrInvalidID = errors.New("model: ID provided was invalid")
+
+	userPwPepper = "secret-dev-pepper"
 )
 
 // UserService is the DB abstraction layer
@@ -46,7 +48,7 @@ func NewUserService(connectionInfo string) (*UserService, error) {
 
 // Create a user
 func (us *UserService) Create(user *User) error {
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password+userPwPepper), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
