@@ -96,9 +96,12 @@ func (us *UserService) AutoMigrate() error {
 }
 
 // DestructiveReset tears and rebuilds the user db
-func (us *UserService) DestructiveReset() {
-	us.db.DropTableIfExists(&User{})
-	us.db.AutoMigrate(&User{})
+func (us *UserService) DestructiveReset() error {
+	err := us.db.DropTableIfExists(&User{}).Error
+	if err != nil {
+		return err
+	}
+	return us.AutoMigrate()
 }
 
 func first(db *gorm.DB, dst interface{}) error {
