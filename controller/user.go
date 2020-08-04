@@ -12,15 +12,17 @@ import (
 // NewUser instantiates and returns a *User type
 func NewUser(us *model.UserService) *User {
 	return &User{
-		NewView: view.New("appcontainer", "user/new"),
-		us:      us,
+		NewView:   view.New("appcontainer", "user/new"),
+		LoginView: view.New("appcontainer", "user/login"),
+		us:        us,
 	}
 }
 
 // User represents a user in our application
 type User struct {
-	NewView *view.View
-	us      *model.UserService
+	NewView   *view.View
+	LoginView *view.View
+	us        *model.UserService
 }
 
 // New is the handler used to sign a new user up
@@ -48,9 +50,23 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "user is", user)
 }
 
-// SignupForm captures user input from forms
+// Login authenticates a user
+func (u *User) Login(w http.ResponseWriter, r *http.Request) {
+	form := LoginForm{}
+	if err := parseForm(&form, r); err != nil {
+		panic(err)
+	}
+}
+
+// SignupForm captures user input from the sign up forms
 type SignupForm struct {
 	Name     string `schema:"name"`
+	Email    string `schema:"email"`
+	Password string `schema:"password"`
+}
+
+// LoginForm captures user input from the log in form
+type LoginForm struct {
 	Email    string `schema:"email"`
 	Password string `schema:"password"`
 }
