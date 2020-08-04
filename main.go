@@ -27,7 +27,7 @@ func main() {
 	us.AutoMigrate()
 
 	staticC := controller.NewStatic()
-	userC := controller.NewUser()
+	userC := controller.NewUser(us)
 
 	r := mux.NewRouter()
 	r.Handle("/", staticC.Home).Methods("GET")

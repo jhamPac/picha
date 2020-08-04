@@ -4,19 +4,22 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/jhampac/picha/model"
 	"github.com/jhampac/picha/view"
 )
 
 // NewUser instantiates and returns a *User type
-func NewUser() *User {
+func NewUser(us *model.UserService) *User {
 	return &User{
 		NewView: view.New("appcontainer", "user/new"),
+		us:      us,
 	}
 }
 
 // User represents a user in our application
 type User struct {
 	NewView *view.View
+	us      *model.UserService
 }
 
 // New is the handler used to sign a new user up
@@ -32,9 +35,15 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 	if err := parseForm(&form, r); err != nil {
 		panic(err)
 	}
-	fmt.Fprintln(w, "Name is", form.Name)
-	fmt.Fprintln(w, "Email is", form.Email)
-	fmt.Fprintln(w, "Password is", form.Password)
+	user := model.User{
+		Name:  form.Name,
+		Email: form.Email,
+	}
+	if err := u.us.Create(&user); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintln(w, "user is", user)
 }
 
 // SignupForm captures user input from forms
