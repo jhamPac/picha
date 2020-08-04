@@ -7,6 +7,7 @@ import (
 
 	// driver for postgres gorm
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // User represents our customers
@@ -45,6 +46,12 @@ func NewUserService(connectionInfo string) (*UserService, error) {
 
 // Create a user
 func (us *UserService) Create(user *User) error {
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.PasswordHash = string(hashedBytes)
+	user.Password = ""
 	return us.db.Create(user).Error
 }
 
