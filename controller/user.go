@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/jhampac/picha/model"
 	"github.com/jhampac/picha/view"
@@ -36,7 +37,7 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	user := model.User{
-		Name:     form.Name,
+		Name:     strings.ToLower(form.Name),
 		Email:    form.Email,
 		Password: form.Password,
 	}
