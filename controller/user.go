@@ -81,7 +81,9 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 
 // Login authenticates a user
 func (u *User) Login(w http.ResponseWriter, r *http.Request) {
-	form := LoginForm{}
+	var form LoginForm
+	// vs
+	// form := LoginForm{}
 
 	// parse the form and place the results at the address *form
 	// gorilla mux schema
