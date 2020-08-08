@@ -39,6 +39,8 @@ func main() {
 	r.Handle("/login", userC.LoginView).Methods("GET")
 	r.HandleFunc("/login", userC.Login).Methods("POST")
 
+	r.HandleFunc("/cookietest", userC.CookieTest).Methods("GET")
+
 	r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		staticC.Error.ServeHTTP(w, r)
