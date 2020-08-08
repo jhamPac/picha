@@ -3,6 +3,8 @@ package model
 import (
 	"errors"
 
+	"github.com/jhampac/picha/hash"
+	"github.com/jhampac/picha/rand"
 	"github.com/jinzhu/gorm"
 
 	// driver for postgres gorm
@@ -34,9 +36,12 @@ var (
 	userPwPepper = "secret-dev-pepper"
 )
 
+const hmacSecretKey = "not-really-a-secret"
+
 // UserService is the DB abstraction layer
 type UserService struct {
-	db *gorm.DB
+	db   *gorm.DB
+	hmac hash.HMAC
 }
 
 // NewUserService instantiates a new service with the provided connection information
@@ -46,8 +51,11 @@ func NewUserService(connectionInfo string) (*UserService, error) {
 		return nil, err
 	}
 	db.LogMode(true)
+	hmac := hash.NewHMAC(hmacSecretKey)
+
 	return &UserService{
-		db: db,
+		db:   db,
+		hmac: hmac,
 	}, nil
 }
 
@@ -59,6 +67,15 @@ func (us *UserService) Create(user *User) error {
 	}
 	user.PasswordHash = string(hashedBytes)
 	user.Password = ""
+
+	if user.Remember == "" {
+		token, err := rand.RememberToken()
+		if err != nil {
+			return err
+		}
+		user.Remember = token
+	}
+
 	return us.db.Create(user).Error
 }
 
