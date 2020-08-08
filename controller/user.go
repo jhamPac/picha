@@ -128,7 +128,7 @@ func (u *User) CookieTest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *User) signIn(w http.ResponseWriter, user *model.User) error {
-	if user.Remember != "" {
+	if user.Remember == "" {
 		token, err := rand.RememberToken()
 		if err != nil {
 			return err
