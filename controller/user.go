@@ -82,11 +82,17 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 // Login authenticates a user
 func (u *User) Login(w http.ResponseWriter, r *http.Request) {
 	form := LoginForm{}
+
+	// parse the form and place the results at the address *form
+	// gorilla mux schema
 	if err := parseForm(&form, r); err != nil {
 		panic(err)
 	}
+
+	// authenticate the user with the UserService
 	user, err := u.us.Authenticate(form.Email, form.Password)
 
+	// check for errors
 	if err != nil {
 		switch err {
 		case model.ErrNotFound:
@@ -101,13 +107,14 @@ func (u *User) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie := http.Cookie{
-		Name:  "email",
-		Value: user.Email,
+	// remember token
+	err = u.signIn(w, user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	http.SetCookie(w, &cookie)
-	fmt.Fprintln(w, user)
+	http.Redirect(w, r, "/cookietest", http.StatusFound)
 }
 
 // CookieTest is a debug route for cookies
