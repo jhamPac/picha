@@ -10,15 +10,15 @@ import (
 	"github.com/jhampac/picha/view"
 )
 
-// SignupForm captures user input from the sign up forms
-type SignupForm struct {
-	Name     string `schema:"name"`
+// LoginForm captures user input from the log in form
+type LoginForm struct {
 	Email    string `schema:"email"`
 	Password string `schema:"password"`
 }
 
-// LoginForm captures user input from the log in form
-type LoginForm struct {
+// SignupForm captures user input from the sign up forms
+type SignupForm struct {
+	Name     string `schema:"name"`
 	Email    string `schema:"email"`
 	Password string `schema:"password"`
 }
