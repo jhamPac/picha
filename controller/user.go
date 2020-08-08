@@ -52,6 +52,7 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 
 	// parse the form and place the results at the address *form
 	// gorilla mux schema
+	// I like pointers at call-site
 	if err := parseForm(&form, r); err != nil {
 		panic(err)
 	}
