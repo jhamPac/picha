@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/jhampac/picha/model"
+	"github.com/jhampac/picha/rand"
 	"github.com/jhampac/picha/view"
 )
 
@@ -79,6 +80,27 @@ func (u *User) Login(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 	fmt.Fprintln(w, user)
+}
+
+func (u *User) signIn(w http.ResponseWriter, user *model.User) error {
+	if user.Remember != "" {
+		token, err := rand.RememberToken()
+		if err != nil {
+			return err
+		}
+		user.Remember = token
+		err = u.us.Update(user)
+		if err != nil {
+			return err
+		}
+	}
+
+	cookie := http.Cookie{
+		Name:  "remember_token",
+		Value: user.Remember,
+	}
+	http.SetCookie(w, &cookie)
+	return nil
 }
 
 // SignupForm captures user input from the sign up forms
