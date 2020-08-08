@@ -17,6 +17,12 @@ var (
 	TemplateExt string = ".gohtml"
 )
 
+// View represents a view created by combining n amount of templates
+type View struct {
+	Template *template.Template
+	Layout   string
+}
+
 // New instantiates a *View type and returns it
 func New(layout string, files ...string) *View {
 	addTemplatePath(files)
@@ -30,6 +36,17 @@ func New(layout string, files ...string) *View {
 	return &View{
 		Template: t,
 		Layout:   layout,
+	}
+}
+
+// Render executes a template and writes it to io.Writer
+func (v *View) Render(w http.ResponseWriter, data interface{}) error {
+	return v.Template.ExecuteTemplate(w, v.Layout, data)
+}
+
+func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if err := v.Render(w, nil); err != nil {
+		panic(err)
 	}
 }
 
@@ -51,22 +68,5 @@ func addTemplatePath(files []string) {
 func addTemplateExt(files []string) {
 	for i, f := range files {
 		files[i] = f + TemplateExt
-	}
-}
-
-// View represents a view created by combining n amount of templates
-type View struct {
-	Template *template.Template
-	Layout   string
-}
-
-// Render executes a template and writes it to io.Writer
-func (v *View) Render(w http.ResponseWriter, data interface{}) error {
-	return v.Template.ExecuteTemplate(w, v.Layout, data)
-}
-
-func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if err := v.Render(w, nil); err != nil {
-		panic(err)
 	}
 }

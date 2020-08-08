@@ -10,13 +10,17 @@ import (
 	"github.com/jhampac/picha/view"
 )
 
-// NewUser instantiates and returns a *User type
-func NewUser(us *model.UserService) *User {
-	return &User{
-		NewView:   view.New("appcontainer", "user/new"),
-		LoginView: view.New("appcontainer", "user/login"),
-		us:        us,
-	}
+// SignupForm captures user input from the sign up forms
+type SignupForm struct {
+	Name     string `schema:"name"`
+	Email    string `schema:"email"`
+	Password string `schema:"password"`
+}
+
+// LoginForm captures user input from the log in form
+type LoginForm struct {
+	Email    string `schema:"email"`
+	Password string `schema:"password"`
 }
 
 // User represents a user in our application
@@ -24,6 +28,15 @@ type User struct {
 	NewView   *view.View
 	LoginView *view.View
 	us        *model.UserService
+}
+
+// NewUser instantiates and returns a *User type
+func NewUser(us *model.UserService) *User {
+	return &User{
+		NewView:   view.New("appcontainer", "user/new"),
+		LoginView: view.New("appcontainer", "user/login"),
+		us:        us,
+	}
 }
 
 // New is the handler used to sign a new user up
@@ -116,17 +129,4 @@ func (u *User) signIn(w http.ResponseWriter, user *model.User) error {
 	}
 	http.SetCookie(w, &cookie)
 	return nil
-}
-
-// SignupForm captures user input from the sign up forms
-type SignupForm struct {
-	Name     string `schema:"name"`
-	Email    string `schema:"email"`
-	Password string `schema:"password"`
-}
-
-// LoginForm captures user input from the log in form
-type LoginForm struct {
-	Email    string `schema:"email"`
-	Password string `schema:"password"`
 }
