@@ -36,19 +36,34 @@ func (u *User) New(w http.ResponseWriter, r *http.Request) {
 // Create a new user by handling the request with form data
 func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 	var form SignupForm
+
+	// parse the form and place the results at the address *form
+	// gorilla mux schema
 	if err := parseForm(&form, r); err != nil {
 		panic(err)
 	}
+
+	// instantiate a user model with the values from the form
 	user := model.User{
 		Name:     strings.ToLower(form.Name),
 		Email:    form.Email,
 		Password: form.Password,
 	}
+
+	// create the user in the db with the provided UserService
 	if err := u.us.Create(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintln(w, "user is", user)
+
+	// remember me token
+	err := u.signIn(w, &user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/cookietest", http.StatusFound)
 }
 
 // Login authenticates a user
