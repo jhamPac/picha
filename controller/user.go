@@ -127,7 +127,14 @@ func (u *User) CookieTest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintln(w, "token is:", cookie.Value)
+
+	user, err := u.us.ByRemember(cookie.Value)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintln(w, user)
 }
 
 func (u *User) signIn(w http.ResponseWriter, user *model.User) error {
