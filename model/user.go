@@ -12,6 +12,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	// ErrNotFound is returned when a resource cannot be found
+	ErrNotFound = errors.New("model: resource not found")
+
+	// ErrInvalidID is returned when an invalid ID is provided to a method like Delete
+	ErrInvalidID = errors.New("model: ID provided was invalid")
+
+	// ErrInvalidPassword is returned when an invalid password is provided
+	ErrInvalidPassword = errors.New("model: incorrect password provided")
+)
+
+const userPwPepper = "secret-dev-pepper"
+
+const hmacSecretKey = "not-really-a-secret"
+
 // User represents our customers
 type User struct {
 	gorm.Model
@@ -22,21 +37,6 @@ type User struct {
 	Remember     string `gorm:"-"`
 	RememberHash string `gorm:"not null;unique_index"`
 }
-
-var (
-	// ErrNotFound is returned when a resource cannot be found
-	ErrNotFound = errors.New("model: resource not found")
-
-	// ErrInvalidID is returned when an invalid ID is provided to a method like Delete
-	ErrInvalidID = errors.New("model: ID provided was invalid")
-
-	// ErrInvalidPassword is returned when an invalid password is provided
-	ErrInvalidPassword = errors.New("model: incorrect password provided")
-
-	userPwPepper = "secret-dev-pepper"
-)
-
-const hmacSecretKey = "not-really-a-secret"
 
 // UserService is the DB abstraction layer
 type UserService struct {
