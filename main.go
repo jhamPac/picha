@@ -18,6 +18,7 @@ const (
 )
 
 func main() {
+	// db connection and service creation; data layer
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	us, err := model.NewUserService(psqlInfo)
 	if err != nil {
@@ -26,9 +27,11 @@ func main() {
 	defer us.Close()
 	us.AutoMigrate()
 
+	// instatantiate controller
 	staticC := controller.NewStatic()
 	userC := controller.NewUser(us)
 
+	// // routing
 	r := mux.NewRouter()
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/contact", staticC.Contact).Methods("GET")
@@ -46,5 +49,6 @@ func main() {
 		staticC.Error.ServeHTTP(w, r)
 	})
 
+	// initiate app; serve app; accept connections
 	http.ListenAndServe(":9000", r)
 }
