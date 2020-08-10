@@ -27,7 +27,7 @@ func main() {
 	defer us.Close()
 	us.AutoMigrate()
 
-	// instatantiate controller
+	// instatantiate controllers
 	staticC := controller.NewStatic()
 	userC := controller.NewUser(us)
 

@@ -7,7 +7,7 @@ import (
 	"hash"
 )
 
-// HMAC is a custom wrapper for hmac
+// HMAC is a custom wrapper around the hash package
 type HMAC struct {
 	hmac hash.Hash
 }
@@ -21,6 +21,7 @@ func NewHMAC(key string) HMAC {
 }
 
 // Hash returns the base64 encoded string of the hmac result
+// following the interface contract: https://golang.org/pkg/hash/#pkg-index
 func (h HMAC) Hash(input string) string {
 	h.hmac.Reset()
 	h.hmac.Write([]byte(input))
