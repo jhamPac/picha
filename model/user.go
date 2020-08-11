@@ -57,28 +57,54 @@ type User struct {
 
 // UserService is the DB abstraction layer
 type UserService struct {
-	db   *gorm.DB
-	hmac hash.HMAC
+	UserDB
 }
 
+// userGorm implements the UserDB interface
 type userGorm struct {
 	db   *gorm.DB
 	hmac hash.HMAC
 }
 
-// NewUserService instantiates a new service with the provided connection information
-func NewUserService(connectionInfo string) (*UserService, error) {
+func newUserGorm(connectionInfo string) (*userGorm, error) {
 	db, err := gorm.Open("postgres", connectionInfo)
 	if err != nil {
 		return nil, err
 	}
 	db.LogMode(true)
 	hmac := hash.NewHMAC(hmacSecretKey)
-
-	return &UserService{
+	return &userGorm{
 		db:   db,
 		hmac: hmac,
 	}, nil
+}
+
+// NewUserService instantiates a new service with the provided connection information
+func NewUserService(connectionInfo string) (*UserService, error) {
+	ug, err := newUserGorm(connectionInfo)
+	if err != nil {
+		return nil, err
+	}
+	return &UserService{
+		UserDB: ug,
+	}, nil
+}
+
+// Authenticate users into the app
+func (us *UserService) Authenticate(email, password string) (*User, error) {
+	foundUser, err := us.ByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password+userPwPepper))
+	switch err {
+	case nil:
+		return foundUser, nil
+	case bcrypt.ErrMismatchedHashAndPassword:
+		return nil, ErrInvalidPassword
+	default:
+		return nil, err
+	}
 }
 
 // Create a user
@@ -100,23 +126,6 @@ func (ug *userGorm) Create(user *User) error {
 	user.RememberHash = ug.hmac.Hash(user.Remember)
 
 	return ug.db.Create(user).Error
-}
-
-// Authenticate users into the app
-func (us *UserService) Authenticate(email, password string) (*User, error) {
-	foundUser, err := us.ByEmail(email)
-	if err != nil {
-		return nil, err
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password+userPwPepper))
-	switch err {
-	case nil:
-		return foundUser, nil
-	case bcrypt.ErrMismatchedHashAndPassword:
-		return nil, ErrInvalidPassword
-	default:
-		return nil, err
-	}
 }
 
 // ByID queries and returns a user by the id provided
