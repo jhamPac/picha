@@ -27,6 +27,18 @@ const userPwPepper = "secret-dev-pepper"
 
 const hmacSecretKey = "not-really-a-secret"
 
+// UserDB is an interface to interact with the users db
+type UserDB interface {
+	ByID(id uint) (*User, error)
+	ByEmail(email string) (*User, error)
+	ByRemember(token string) (*User, error)
+
+	// methods for altering users
+	Create(user *User) error
+	Update(user *User) error
+	Delete(id uint) error
+}
+
 // User represents our customers
 type User struct {
 	gorm.Model
