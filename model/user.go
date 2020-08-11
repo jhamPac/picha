@@ -37,6 +37,11 @@ type UserDB interface {
 	Create(user *User) error
 	Update(user *User) error
 	Delete(id uint) error
+
+	// db utilities
+	Close() error
+	AutoMigrate() error
+	DestructiveReset() error
 }
 
 // User represents our customers
