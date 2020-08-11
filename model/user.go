@@ -66,6 +66,11 @@ type userGorm struct {
 	hmac hash.HMAC
 }
 
+// userValidator is a layer that validates and normalizes data before passing it on to the next layer
+type userValidator struct {
+	UserDB
+}
+
 func newUserGorm(connectionInfo string) (*userGorm, error) {
 	db, err := gorm.Open("postgres", connectionInfo)
 	if err != nil {
@@ -85,8 +90,12 @@ func NewUserService(connectionInfo string) (*UserService, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// interface chaining; validator first then to the gorm/db layer
 	return &UserService{
-		UserDB: ug,
+		UserDB: userValidator{
+			UserDB: ug,
+		},
 	}, nil
 }
 
