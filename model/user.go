@@ -60,15 +60,15 @@ type UserService struct {
 	UserDB
 }
 
+// userValidator implements the UserDB; It is a layer that validates and normalizes data before passing it on to the next UserDB layer
+type userValidator struct {
+	UserDB
+}
+
 // userGorm implements the UserDB interface
 type userGorm struct {
 	db   *gorm.DB
 	hmac hash.HMAC
-}
-
-// userValidator is a layer that validates and normalizes data before passing it on to the next layer
-type userValidator struct {
-	UserDB
 }
 
 func newUserGorm(connectionInfo string) (*userGorm, error) {
