@@ -127,9 +127,10 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 	}
 }
 
-// Create a user
-func (ug *userGorm) Create(user *User) error {
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password+userPwPepper), bcrypt.DefaultCost)
+// Create runs through the validation and normalization layer first
+func (uv *userValidator) Create(user *User) error {
+	saltNpepper := []byte(user.Password + userPwPepper)
+	hashedBytes, err := bcrypt.GenerateFromPassword(saltNpepper, bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
@@ -143,8 +144,12 @@ func (ug *userGorm) Create(user *User) error {
 		}
 		user.Remember = token
 	}
-	user.RememberHash = ug.hmac.Hash(user.Remember)
+	user.RememberHash = uv.hmac.Hash(user.Remember)
+	return uv.UserDB.Create(user)
+}
 
+// Create inserts the normalized data into the db
+func (ug *userGorm) Create(user *User) error {
 	return ug.db.Create(user).Error
 }
 
@@ -170,6 +175,7 @@ func (ug *userGorm) ByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
+// ByRemember is the first deferment in the chain to validate and normalize
 func (uv *userValidator) ByRemember(token string) (*User, error) {
 	rememberHash := uv.hmac.Hash(token)
 	return uv.UserDB.ByRemember(rememberHash)
