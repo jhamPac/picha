@@ -74,8 +74,7 @@ type userValidator struct {
 
 // userGorm implements the UserDB interface
 type userGorm struct {
-	db   *gorm.DB
-	hmac hash.HMAC
+	db *gorm.DB
 }
 
 func newUserGorm(connectionInfo string) (*userGorm, error) {
@@ -84,10 +83,8 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 		return nil, err
 	}
 	db.LogMode(true)
-	hmac := hash.NewHMAC(hmacSecretKey)
 	return &userGorm{
-		db:   db,
-		hmac: hmac,
+		db: db,
 	}, nil
 }
 
