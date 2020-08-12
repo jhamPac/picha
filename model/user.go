@@ -126,13 +126,9 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 
 // Create runs through the validation and normalization layer first
 func (uv *userValidator) Create(user *User) error {
-	saltNpepper := []byte(user.Password + userPwPepper)
-	hashedBytes, err := bcrypt.GenerateFromPassword(saltNpepper, bcrypt.DefaultCost)
-	if err != nil {
+	if err := runUserValFns(user, uv.bcryptPassword); err != nil {
 		return err
 	}
-	user.PasswordHash = string(hashedBytes)
-	user.Password = ""
 
 	if user.Remember == "" {
 		token, err := rand.RememberToken()
@@ -190,6 +186,10 @@ func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
 
 // Update is the first deferment in the chain to validate and normalize
 func (uv *userValidator) Update(user *User) error {
+	if err := runUserValFns(user, uv.bcryptPassword); err != nil {
+		return err
+	}
+
 	if user.Remember != "" {
 		user.RememberHash = uv.hmac.Hash(user.Remember)
 	}
@@ -259,6 +259,10 @@ func runUserValFns(user *User, fns ...userValFn) error {
 }
 
 func (uv *userValidator) bcryptPassword(user *User) error {
+	if user.Password == "" {
+		return nil
+	}
+
 	saltNpepper := []byte(user.Password + userPwPepper)
 	hashedBytes, err := bcrypt.GenerateFromPassword(saltNpepper, bcrypt.DefaultCost)
 	if err != nil {
