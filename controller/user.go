@@ -27,11 +27,11 @@ type SignupForm struct {
 type User struct {
 	NewView   *view.View
 	LoginView *view.View
-	us        *model.UserService
+	us        model.UserService
 }
 
 // NewUser instantiates and returns a *User type
-func NewUser(us *model.UserService) *User {
+func NewUser(us model.UserService) *User {
 	return &User{
 		NewView:   view.New("appcontainer", "user/new"),
 		LoginView: view.New("appcontainer", "user/login"),

@@ -44,6 +44,12 @@ type UserDB interface {
 	DestructiveReset() error
 }
 
+// UserService is a set of methods used to manipulate and work with the user model
+type UserService interface {
+	Authenticate(email, password string) (*User, error)
+	UserDB
+}
+
 // User represents our customers
 type User struct {
 	gorm.Model
@@ -55,8 +61,8 @@ type User struct {
 	RememberHash string `gorm:"not null;unique_index"`
 }
 
-// UserService is the DB abstraction layer
-type UserService struct {
+// userService implements the UserService interface
+type userService struct {
 	UserDB
 }
 
@@ -85,22 +91,22 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 }
 
 // NewUserService instantiates a new service with the provided connection information
-func NewUserService(connectionInfo string) (*UserService, error) {
+func NewUserService(connectionInfo string) (UserService, error) {
 	ug, err := newUserGorm(connectionInfo)
 	if err != nil {
 		return nil, err
 	}
 
 	// interface chaining; validator first then to the gorm/db layer
-	return &UserService{
-		UserDB: userValidator{
+	return &userService{
+		UserDB: &userValidator{
 			UserDB: ug,
 		},
 	}, nil
 }
 
 // Authenticate users into the app
-func (us *UserService) Authenticate(email, password string) (*User, error) {
+func (us *userService) Authenticate(email, password string) (*User, error) {
 	foundUser, err := us.ByEmail(email)
 	if err != nil {
 		return nil, err
