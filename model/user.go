@@ -204,11 +204,16 @@ func (ug *userGorm) Update(user *User) error {
 	return ug.db.Save(user).Error
 }
 
-// Delete will delete a user from the db
-func (ug *userGorm) Delete(id uint) error {
+// Delete validate the ID first then pass it to the next in chain
+func (uv *userValidator) Delete(id uint) error {
 	if id == 0 {
 		return ErrInvalidID
 	}
+	return uv.UserDB.Delete(id)
+}
+
+// Delete will delete a user from the db
+func (ug *userGorm) Delete(id uint) error {
 	user := User{Model: gorm.Model{ID: id}}
 	return ug.db.Delete(&user).Error
 }
