@@ -191,11 +191,16 @@ func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
 	return &user, nil
 }
 
-// Update will update the provided user with all of the data in the provided user object
-func (ug *userGorm) Update(user *User) error {
+// Update is the first deferment in the chain to validate and normalize
+func (uv *userValidator) Update(user *User) error {
 	if user.Remember != "" {
-		user.RememberHash = ug.hmac.Hash(user.Remember)
+		user.RememberHash = uv.hmac.Hash(user.Remember)
 	}
+	return uv.UserDB.Update(user)
+}
+
+// Update will update the provided user with all of the data in the provided user object from the validation layer
+func (ug *userGorm) Update(user *User) error {
 	return ug.db.Save(user).Error
 }
 
