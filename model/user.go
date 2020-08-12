@@ -69,6 +69,7 @@ type userService struct {
 // userValidator implements the UserDB; It is a layer that validates and normalizes data before passing it on to the next UserDB layer
 type userValidator struct {
 	UserDB
+	hmac hash.HMAC
 }
 
 // userGorm implements the UserDB interface
@@ -97,11 +98,15 @@ func NewUserService(connectionInfo string) (UserService, error) {
 		return nil, err
 	}
 
+	hmac := hash.NewHMAC(hmacSecretKey)
+	uv := &userValidator{
+		UserDB: ug,
+		hmac:   hmac,
+	}
+
 	// interface chaining; validator first then to the gorm/db layer
 	return &userService{
-		UserDB: &userValidator{
-			UserDB: ug,
-		},
+		UserDB: uv,
 	}, nil
 }
 
@@ -165,10 +170,14 @@ func (ug *userGorm) ByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-// ByRemember looks up a user with the given remember token and returns that user
-func (ug *userGorm) ByRemember(token string) (*User, error) {
+func (uv *userValidator) ByRemember(token string) (*User, error) {
+	rememberHash := uv.hmac.Hash(token)
+	return uv.UserDB.ByRemember(rememberHash)
+}
+
+// ByRemember looks up a user with the given rememberHash provided by the validation layer
+func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
 	var user User
-	rememberHash := ug.hmac.Hash(token)
 	err := first(ug.db.Where("remember_hash = ?", rememberHash), &user)
 	if err != nil {
 		return nil, err
