@@ -244,3 +244,27 @@ func first(db *gorm.DB, dst interface{}) error {
 	}
 	return err
 }
+
+type userValFn func(*User) error
+
+// this is a lot like the functional programing I am used to in JavaScript
+// it is like pipe or flow. (...fns) => (x) => fns.reduce()
+func runUserValFns(user *User, fns ...userValFn) error {
+	for _, fn := range fns {
+		if err := fn(user); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (uv *userValidator) bcryptPassword(user *User) error {
+	saltNpepper := []byte(user.Password + userPwPepper)
+	hashedBytes, err := bcrypt.GenerateFromPassword(saltNpepper, bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.PasswordHash = string(hashedBytes)
+	user.Password = ""
+	return nil
+}
