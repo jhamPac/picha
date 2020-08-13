@@ -206,8 +206,11 @@ func (ug *userGorm) Update(user *User) error {
 
 // Delete validate the ID first then pass it to the next in chain
 func (uv *userValidator) Delete(id uint) error {
-	if id == 0 {
-		return ErrInvalidID
+	var user User
+	user.ID = id
+	err := runUserValFns(&user, uv.idGreaterThan(0))
+	if err != nil {
+		return err
 	}
 	return uv.UserDB.Delete(id)
 }
@@ -294,4 +297,14 @@ func (uv *userValidator) hmacRemember(user *User) error {
 	}
 	user.RememberHash = uv.hmac.Hash(user.Remember)
 	return nil
+}
+
+func (uv *userValidator) idGreaterThan(n uint) userValFn {
+	fn := func(user *User) error {
+		if user.ID <= n {
+			return ErrInvalidID
+		}
+		return nil
+	}
+	return fn
 }
