@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"regexp"
 	"strings"
 
 	"github.com/jhampac/picha/hash"
@@ -73,7 +74,8 @@ type userService struct {
 // userValidator implements the UserDB; It is a layer that validates and normalizes data before passing it on to the next UserDB layer
 type userValidator struct {
 	UserDB
-	hmac hash.HMAC
+	hmac       hash.HMAC
+	emailRegex *regexp.Regexp
 }
 
 // userGorm implements the UserDB interface
@@ -92,6 +94,14 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 	}, nil
 }
 
+func newUserValidator(orm UserDB, hmac hash.HMAC) *userValidator {
+	return &userValidator{
+		UserDB:     orm,
+		hmac:       hmac,
+		emailRegex: regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,16}$`),
+	}
+}
+
 // NewUserService instantiates a new service with the provided connection information
 func NewUserService(connectionInfo string) (UserService, error) {
 	ug, err := newUserGorm(connectionInfo)
@@ -100,10 +110,7 @@ func NewUserService(connectionInfo string) (UserService, error) {
 	}
 
 	hmac := hash.NewHMAC(hmacSecretKey)
-	uv := &userValidator{
-		UserDB: ug,
-		hmac:   hmac,
-	}
+	uv := newUserValidator(ug, hmac)
 
 	// interface chaining; validator first then to the gorm/db layer
 	return &userService{
