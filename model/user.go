@@ -29,6 +29,9 @@ var (
 
 	// ErrEmailInvalid is returned when an email address provided does not match our regex
 	ErrEmailInvalid = errors.New("model: email address is not valid")
+
+	// ErrEmailTaken is returned when an update or create is attempted with an email address that is already in use
+	ErrEmailTaken = errors.New("model: email address is already taken")
 )
 
 const userPwPepper = "secret-dev-pepper"
@@ -146,7 +149,8 @@ func (uv *userValidator) Create(user *User) error {
 		uv.hmacRemember,
 		uv.normalizeEmail,
 		uv.requireEmail,
-		uv.emailFormat)
+		uv.emailFormat,
+		uv.emailIsAvail)
 
 	if err != nil {
 		return err
@@ -222,7 +226,8 @@ func (uv *userValidator) Update(user *User) error {
 		uv.hmacRemember,
 		uv.normalizeEmail,
 		uv.requireEmail,
-		uv.emailFormat)
+		uv.emailFormat,
+		uv.emailIsAvail)
 
 	if err != nil {
 		return err
@@ -361,6 +366,24 @@ func (uv *userValidator) emailFormat(user *User) error {
 
 	if uv.emailRegex.MatchString(user.Email) == false {
 		return ErrEmailInvalid
+	}
+
+	return nil
+}
+
+func (uv *userValidator) emailIsAvail(user *User) error {
+	existing, err := uv.ByEmail(user.Email)
+	if err == ErrNotFound {
+		return nil
+	}
+
+	// ensure we did not get an err other than ErrNotFound
+	if err != nil {
+		return err
+	}
+
+	if user.ID != existing.ID {
+		return ErrEmailTaken
 	}
 
 	return nil
