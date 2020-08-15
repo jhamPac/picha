@@ -100,7 +100,7 @@ func (u *User) Login(w http.ResponseWriter, r *http.Request) {
 		switch err {
 		case model.ErrNotFound:
 			fmt.Fprintln(w, "invalid email address")
-		case model.ErrInvalidPassword:
+		case model.ErrPasswordIncorrect:
 			fmt.Fprintln(w, "invalid password provided")
 		case nil:
 			fmt.Fprintln(w, user)

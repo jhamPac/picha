@@ -18,11 +18,11 @@ var (
 	// ErrNotFound is returned when a resource cannot be found
 	ErrNotFound = errors.New("model: resource not found")
 
-	// ErrInvalidID is returned when an invalid ID is provided to a method like Delete
-	ErrInvalidID = errors.New("model: ID provided was invalid")
+	// ErrIDInvalid is returned when an invalid ID is provided to a method like Delete
+	ErrIDInvalid = errors.New("model: ID provided was invalid")
 
-	// ErrInvalidPassword is returned when an invalid password is provided
-	ErrInvalidPassword = errors.New("model: incorrect password provided")
+	// ErrPasswordIncorrect is returned when an invalid password is provided
+	ErrPasswordIncorrect = errors.New("model: incorrect password provided")
 
 	// ErrEmailRequired is returned when an email address is not provided when creating a user
 	ErrEmailRequired = errors.New("model: email address is required")
@@ -135,7 +135,7 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 	case nil:
 		return foundUser, nil
 	case bcrypt.ErrMismatchedHashAndPassword:
-		return nil, ErrInvalidPassword
+		return nil, ErrPasswordIncorrect
 	default:
 		return nil, err
 	}
@@ -339,7 +339,7 @@ func (uv *userValidator) hmacRemember(user *User) error {
 func (uv *userValidator) idGreaterThan(n uint) userValFn {
 	fn := func(user *User) error {
 		if user.ID <= n {
-			return ErrInvalidID
+			return ErrIDInvalid
 		}
 		return nil
 	}
