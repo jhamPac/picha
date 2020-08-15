@@ -24,6 +24,9 @@ var (
 	// ErrPasswordIncorrect is returned when an invalid password is provided
 	ErrPasswordIncorrect = errors.New("model: incorrect password provided")
 
+	// ErrPasswordTooShort is returned when the password provided does not meet the 8 character minimum
+	ErrPasswordTooShort = errors.New("model: passwords must be at least 8 characters long")
+
 	// ErrEmailRequired is returned when an email address is not provided when creating a user
 	ErrEmailRequired = errors.New("model: email address is required")
 
@@ -144,6 +147,7 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 // Create runs through the validation and normalization layer first
 func (uv *userValidator) Create(user *User) error {
 	err := runUserValFns(user,
+		uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.setRememberIfUnset,
 		uv.hmacRemember,
@@ -222,6 +226,7 @@ func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
 // Update is the first deferment in the chain to validate and normalize
 func (uv *userValidator) Update(user *User) error {
 	err := runUserValFns(user,
+		uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.hmacRemember,
 		uv.normalizeEmail,
@@ -386,6 +391,19 @@ func (uv *userValidator) emailIsAvail(user *User) error {
 
 	if user.ID != existing.ID {
 		return ErrEmailTaken
+	}
+
+	return nil
+}
+
+func (uv *userValidator) passwordMinLength(user *User) error {
+	// ignore the validation
+	if user.Password == "" {
+		return nil
+	}
+
+	if len(user.Password) < 8 {
+		return ErrPasswordTooShort
 	}
 
 	return nil
