@@ -373,6 +373,8 @@ func (uv *userValidator) emailFormat(user *User) error {
 
 func (uv *userValidator) emailIsAvail(user *User) error {
 	existing, err := uv.ByEmail(user.Email)
+
+	// this would not happen during an Update; only on a Create
 	if err == ErrNotFound {
 		return nil
 	}
