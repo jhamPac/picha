@@ -27,6 +27,9 @@ var (
 	// ErrPasswordTooShort is returned when the password provided does not meet the 8 character minimum
 	ErrPasswordTooShort = errors.New("model: passwords must be at least 8 characters long")
 
+	// ErrPasswordRequired is returned when a create is attempted without a user password provided
+	ErrPasswordRequired = errors.New("model: password is required")
+
 	// ErrEmailRequired is returned when an email address is not provided when creating a user
 	ErrEmailRequired = errors.New("model: email address is required")
 
@@ -147,12 +150,14 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 // Create runs through the validation and normalization layer first
 func (uv *userValidator) Create(user *User) error {
 	err := runUserValFns(user,
+		uv.passwordRequired,
 		uv.passwordMinLength,
 		uv.bcryptPassword,
+		uv.passwordHashRequired,
 		uv.setRememberIfUnset,
 		uv.hmacRemember,
-		uv.normalizeEmail,
 		uv.requireEmail,
+		uv.normalizeEmail,
 		uv.emailFormat,
 		uv.emailIsAvail)
 
@@ -228,9 +233,10 @@ func (uv *userValidator) Update(user *User) error {
 	err := runUserValFns(user,
 		uv.passwordMinLength,
 		uv.bcryptPassword,
+		uv.passwordHashRequired,
 		uv.hmacRemember,
-		uv.normalizeEmail,
 		uv.requireEmail,
+		uv.normalizeEmail,
 		uv.emailFormat,
 		uv.emailIsAvail)
 
@@ -406,5 +412,19 @@ func (uv *userValidator) passwordMinLength(user *User) error {
 		return ErrPasswordTooShort
 	}
 
+	return nil
+}
+
+func (uv *userValidator) passwordRequired(user *User) error {
+	if user.Password == "" {
+		return ErrPasswordRequired
+	}
+	return nil
+}
+
+func (uv *userValidator) passwordHashRequired(user *User) error {
+	if user.PasswordHash == "" {
+		return ErrPasswordRequired
+	}
 	return nil
 }
