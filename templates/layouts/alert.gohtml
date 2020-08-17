@@ -1,5 +1,6 @@
 {{define "alert"}}
-    <div class="alert pure-u-1" role="alert">
-    <p><strong>Danger!</strong> Something went wrong</p>
+    <div class="alert alert-{{.Level}} pure-u-1" role="alert">
+    <button>x</button>
+    <p>{{.Message}}</p>
     </div>
 {{end}}
