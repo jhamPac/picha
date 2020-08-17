@@ -12,8 +12,22 @@
             }
 
             main .alert {
-                color: red;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
                 text-align: center;
+            }
+
+            main .alert.alert-error {
+                color: red;
+            }
+
+            main .alert.alert-success {
+                color: green;
+            }
+
+            main .alert button {
+                margin-left: 15px;
             }
         </style>
     </head>
