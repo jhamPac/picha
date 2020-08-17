@@ -36,7 +36,9 @@
             {{template "navbar"}}
         </nav>
         <main class="pure-g">
-            {{template "alert" .}}
+            {{if .}}
+                {{template "alert" .}}
+            {{end}}
             {{template "yield" .}}
             {{template "footer"}}
         </main>
