@@ -17,6 +17,18 @@ var (
 	TemplateExt string = ".gohtml"
 )
 
+// Data is the top level structure that views expect for data
+type Data struct {
+	Alert *Alert
+	Yield interface{}
+}
+
+// Alert is data used to render alerts in templates
+type Alert struct {
+	Level   string
+	Message string
+}
+
 // View represents a view created by combining n amount of templates
 type View struct {
 	Template *template.Template

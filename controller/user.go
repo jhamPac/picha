@@ -41,17 +41,7 @@ func NewUser(us model.UserService) *User {
 
 // New is the handler used to sign a new user up
 func (u *User) New(w http.ResponseWriter, r *http.Request) {
-	type Alert struct {
-		Level   string
-		Message string
-	}
-
-	alert := Alert{
-		Level:   "success",
-		Message: "Successfully rendered a dynamic alert!",
-	}
-
-	if err := u.NewView.Render(w, alert); err != nil {
+	if err := u.NewView.Render(w, nil); err != nil {
 		panic(err)
 	}
 }
