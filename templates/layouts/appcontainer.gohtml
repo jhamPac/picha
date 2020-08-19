@@ -16,6 +16,21 @@
                 flex-direction: row;
                 justify-content: center;
                 text-align: center;
+                visibility: visible;
+
+                animation: fadeOut 2s fadeOut ease-in-out 3s forwards;
+                -webkit-animation: 2s fadeOut ease-in-out 3s forwards;
+                -moz-animation: 2s fadeOut ease-in-out 3s forwards;
+                -o-animation: 2s fadeOut ease-in-out 3s forwards;
+                -ms-animation: 2s fadeOut ease-in-out 3s forwards;
+            }
+
+            @keyframes fadeOut {
+                0% {opacity:1;}
+                100% {
+                    opacity: 0;
+                    visibility: hidden;
+                }
             }
 
             main .alert.alert-danger {
