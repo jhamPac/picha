@@ -74,14 +74,18 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 
 	// create the user in the db with the provided UserService
 	if err := u.us.Create(&user); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		vd.Alert = &view.Alert{
+			Level:   view.AlertLvlError,
+			Message: err.Error(),
+		}
+		u.NewView.Render(w, vd)
 		return
 	}
 
 	// remember me token
 	err := u.signIn(w, &user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
 
