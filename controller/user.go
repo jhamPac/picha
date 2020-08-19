@@ -41,7 +41,17 @@ func NewUser(us model.UserService) *User {
 
 // New is the handler used to sign a new user up
 func (u *User) New(w http.ResponseWriter, r *http.Request) {
-	if err := u.NewView.Render(w, nil); err != nil {
+	alert := view.Alert{
+		Level:   view.AlertLvlSuccess,
+		Message: "Sucessfully rendered a dynamic alert!",
+	}
+
+	data := view.Data{
+		Alert: &alert,
+		Yield: "anything",
+	}
+
+	if err := u.NewView.Render(w, data); err != nil {
 		panic(err)
 	}
 }

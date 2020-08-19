@@ -29,6 +29,13 @@ type Alert struct {
 	Message string
 }
 
+const (
+	AlertLvlError   = "danger"
+	AlertLvlWarning = "warning"
+	AlertLvlInfo    = "info"
+	AlertLvlSuccess = "success"
+)
+
 // View represents a view created by combining n amount of templates
 type View struct {
 	Template *template.Template
@@ -53,6 +60,16 @@ func New(layout string, files ...string) *View {
 
 // Render executes a template and writes it to io.Writer
 func (v *View) Render(w http.ResponseWriter, data interface{}) error {
+	w.Header().Set("Content-Type", "text/html")
+
+	switch data.(type) {
+	case Data:
+	default:
+		data = Data{
+			Yield: data,
+		}
+	}
+
 	return v.Template.ExecuteTemplate(w, v.Layout, data)
 }
 
