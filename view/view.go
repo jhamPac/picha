@@ -34,6 +34,7 @@ const (
 	AlertLvlWarning = "warning"
 	AlertLvlInfo    = "info"
 	AlertLvlSuccess = "success"
+	AlertMsgGeneric = "Something went wrong. Please try again, and contact usif the problem persists."
 )
 
 // View represents a view created by combining n amount of templates

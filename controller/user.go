@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -41,17 +42,7 @@ func NewUser(us model.UserService) *User {
 
 // New is the handler used to sign a new user up
 func (u *User) New(w http.ResponseWriter, r *http.Request) {
-	alert := view.Alert{
-		Level:   view.AlertLvlSuccess,
-		Message: "Sucessfully rendered a dynamic alert!",
-	}
-
-	data := view.Data{
-		Alert: &alert,
-		Yield: "anything",
-	}
-
-	if err := u.NewView.Render(w, data); err != nil {
+	if err := u.NewView.Render(w, nil); err != nil {
 		panic(err)
 	}
 }
@@ -59,12 +50,19 @@ func (u *User) New(w http.ResponseWriter, r *http.Request) {
 // Create a new user by handling the request with form data
 func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 	var form SignupForm
+	var vd view.Data
 
 	// parse the form and place the results at the address *form
 	// gorilla mux schema
 	// I like pointers at call-site
 	if err := parseForm(&form, r); err != nil {
-		panic(err)
+		log.Println(err)
+		vd.Alert = &view.Alert{
+			Level:   view.AlertLvlError,
+			Message: view.AlertMsgGeneric,
+		}
+		u.NewView.Render(w, vd)
+		return
 	}
 
 	// instantiate a user model with the values from the form
