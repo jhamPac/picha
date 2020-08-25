@@ -79,11 +79,6 @@ type UserDB interface {
 	Create(user *User) error
 	Update(user *User) error
 	Delete(id uint) error
-
-	// db utilities
-	Close() error
-	AutoMigrate() error
-	DestructiveReset() error
 }
 
 // User represents our customers
@@ -275,28 +270,6 @@ func (uv *userValidator) Delete(id uint) error {
 func (ug *userGorm) Delete(id uint) error {
 	user := User{Model: gorm.Model{ID: id}}
 	return ug.db.Delete(&user).Error
-}
-
-// Close the db connection
-func (ug *userGorm) Close() error {
-	return ug.db.Close()
-}
-
-// AutoMigrate will attempt to automatically migrate the user table
-func (ug *userGorm) AutoMigrate() error {
-	if err := ug.db.AutoMigrate(&User{}).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-// DestructiveReset tears and rebuilds the user db
-func (ug *userGorm) DestructiveReset() error {
-	err := ug.db.DropTableIfExists(&User{}).Error
-	if err != nil {
-		return err
-	}
-	return ug.AutoMigrate()
 }
 
 func first(db *gorm.DB, dst interface{}) error {
