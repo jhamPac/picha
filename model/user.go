@@ -46,6 +46,19 @@ var (
 	ErrRememberTooShort = errors.New("model: remember token must be at least 32 bytes")
 )
 
+type modelError string
+
+func (e modelError) Error() string {
+	return string(e)
+}
+
+func (e modelError) Public() string {
+	s := strings.Replace(string(e), "model: ", "", 1)
+	split := strings.Split(s, " ")
+	split[0] = strings.Title(split[0])
+	return strings.Join(split, " ")
+}
+
 const userPwPepper = "secret-dev-pepper"
 
 const hmacSecretKey = "not-really-a-secret"
