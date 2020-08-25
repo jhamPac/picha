@@ -8,3 +8,21 @@ type Gallery struct {
 	UserID uint   `gorm:"not_null;index"`
 	Title  string `gorm:"not_null"`
 }
+
+// GalleryService provides an interface to the Gallery model
+type GalleryService interface {
+	GalleryDB
+}
+
+// GalleryDB is the DB connection for galleries
+type GalleryDB interface {
+	Create(gallery *Gallery) error
+}
+
+type galleryGorm struct {
+	db *gorm.DB
+}
+
+func (gg *galleryGorm) Create(gallery *Gallery) error {
+	return nil
+}
