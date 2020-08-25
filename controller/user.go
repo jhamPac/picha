@@ -87,13 +87,16 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 // Login authenticates a user
 func (u *User) Login(w http.ResponseWriter, r *http.Request) {
 	var form LoginForm
+	var vd view.Data
 	// vs
 	// form := LoginForm{}
 
 	// parse the form and place the results at the address *form
 	// gorilla mux schema
 	if err := parseForm(&form, r); err != nil {
-		panic(err)
+		vd.SetAlert(err)
+		u.LoginView.Render(w, vd)
+		return
 	}
 
 	// authenticate the user with the UserService
@@ -103,21 +106,19 @@ func (u *User) Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case model.ErrNotFound:
-			fmt.Fprintln(w, "invalid email address")
-		case model.ErrPasswordIncorrect:
-			fmt.Fprintln(w, "invalid password provided")
-		case nil:
-			fmt.Fprintln(w, user)
+			vd.AlertError("No user exists with that email address")
 		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			vd.SetAlert(err)
 		}
+		u.LoginView.Render(w, vd)
 		return
 	}
 
 	// remember token
 	err = u.signIn(w, user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		vd.SetAlert(err)
+		u.LoginView.Render(w, vd)
 		return
 	}
 
