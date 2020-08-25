@@ -63,6 +63,12 @@ const userPwPepper = "secret-dev-pepper"
 
 const hmacSecretKey = "not-really-a-secret"
 
+// UserService is a set of methods used to manipulate and work with the user model
+type UserService interface {
+	Authenticate(email, password string) (*User, error)
+	UserDB
+}
+
 // UserDB is an interface to interact with the users db
 type UserDB interface {
 	ByID(id uint) (*User, error)
@@ -78,12 +84,6 @@ type UserDB interface {
 	Close() error
 	AutoMigrate() error
 	DestructiveReset() error
-}
-
-// UserService is a set of methods used to manipulate and work with the user model
-type UserService interface {
-	Authenticate(email, password string) (*User, error)
-	UserDB
 }
 
 // User represents our customers
@@ -114,17 +114,6 @@ type userGorm struct {
 	db *gorm.DB
 }
 
-func newUserGorm(connectionInfo string) (*userGorm, error) {
-	db, err := gorm.Open("postgres", connectionInfo)
-	if err != nil {
-		return nil, err
-	}
-	db.LogMode(true)
-	return &userGorm{
-		db: db,
-	}, nil
-}
-
 func newUserValidator(orm UserDB, hmac hash.HMAC) *userValidator {
 	return &userValidator{
 		UserDB:     orm,
@@ -134,19 +123,15 @@ func newUserValidator(orm UserDB, hmac hash.HMAC) *userValidator {
 }
 
 // NewUserService instantiates a new service with the provided connection information
-func NewUserService(connectionInfo string) (UserService, error) {
-	ug, err := newUserGorm(connectionInfo)
-	if err != nil {
-		return nil, err
-	}
-
+func NewUserService(db *gorm.DB) UserService {
+	ug := &userGorm{db}
 	hmac := hash.NewHMAC(hmacSecretKey)
 	uv := newUserValidator(ug, hmac)
 
 	// interface chaining; validator first then to the gorm/db layer
 	return &userService{
 		UserDB: uv,
-	}, nil
+	}
 }
 
 // Authenticate users into the app

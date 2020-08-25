@@ -20,16 +20,16 @@ const (
 func main() {
 	// db connection and service creation; data layer
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	us, err := model.NewUserService(psqlInfo)
+	services, err := model.NewServices(psqlInfo)
 	if err != nil {
 		panic(err)
 	}
-	defer us.Close()
-	us.AutoMigrate()
+	defer services.User.Close()
+	services.User.AutoMigrate()
 
 	// instatantiate controllers
 	staticC := controller.NewStatic()
-	userC := controller.NewUser(us)
+	userC := controller.NewUser(services.User)
 
 	// // routing
 	r := mux.NewRouter()
