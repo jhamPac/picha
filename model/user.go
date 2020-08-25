@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"regexp"
 	"strings"
 
@@ -14,36 +13,36 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var (
+const (
 	// ErrNotFound is returned when a resource cannot be found
-	ErrNotFound = errors.New("model: resource not found")
+	ErrNotFound modelError = "model: resource not found"
 
 	// ErrIDInvalid is returned when an invalid ID is provided to a method like Delete
-	ErrIDInvalid = errors.New("model: ID provided was invalid")
+	ErrIDInvalid modelError = "model: ID provided was invalid"
 
 	// ErrPasswordIncorrect is returned when an invalid password is provided
-	ErrPasswordIncorrect = errors.New("model: incorrect password provided")
+	ErrPasswordIncorrect modelError = "model: incorrect password provided"
 
 	// ErrPasswordTooShort is returned when the password provided does not meet the 8 character minimum
-	ErrPasswordTooShort = errors.New("model: passwords must be at least 8 characters long")
+	ErrPasswordTooShort modelError = "model: passwords must be at least 8 characters long"
 
 	// ErrPasswordRequired is returned when a create is attempted without a user password provided
-	ErrPasswordRequired = errors.New("model: password is required")
+	ErrPasswordRequired modelError = "model: password is required"
 
 	// ErrEmailRequired is returned when an email address is not provided when creating a user
-	ErrEmailRequired = errors.New("model: email address is required")
+	ErrEmailRequired modelError = "model: email address is required"
 
 	// ErrEmailInvalid is returned when an email address provided does not match our regex
-	ErrEmailInvalid = errors.New("model: email address is not valid")
+	ErrEmailInvalid modelError = "model: email address is not valid"
 
 	// ErrEmailTaken is returned when an update or create is attempted with an email address that is already in use
-	ErrEmailTaken = errors.New("model: email address is already taken")
+	ErrEmailTaken modelError = "model: email address is already taken"
 
 	// ErrRememberRequired is returned when a create or update is attempted without a user remember token hash
-	ErrRememberRequired = errors.New("model: remember token is required")
+	ErrRememberRequired modelError = "model: remember token is required"
 
 	// ErrRememberTooShort is returned when a token does not meet the 32 byte minimum
-	ErrRememberTooShort = errors.New("model: remember token must be at least 32 bytes")
+	ErrRememberTooShort modelError = "model: remember token must be at least 32 bytes"
 )
 
 type modelError string
