@@ -51,6 +51,7 @@ func (e modelError) Error() string {
 	return string(e)
 }
 
+// Public implements the PublicError interface in the view package
 func (e modelError) Public() string {
 	s := strings.Replace(string(e), "model: ", "", 1)
 	split := strings.Split(s, " ")

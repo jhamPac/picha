@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -56,11 +55,7 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 	// gorilla mux schema
 	// I like pointers at call-site
 	if err := parseForm(&form, r); err != nil {
-		log.Println(err)
-		vd.Alert = &view.Alert{
-			Level:   view.AlertLvlError,
-			Message: view.AlertMsgGeneric,
-		}
+		vd.SetAlert(err)
 		u.NewView.Render(w, vd)
 		return
 	}
@@ -74,10 +69,7 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 
 	// create the user in the db with the provided UserService
 	if err := u.us.Create(&user); err != nil {
-		vd.Alert = &view.Alert{
-			Level:   view.AlertLvlError,
-			Message: err.Error(),
-		}
+		vd.SetAlert(err)
 		u.NewView.Render(w, vd)
 		return
 	}
