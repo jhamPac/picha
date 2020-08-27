@@ -30,6 +30,7 @@ func main() {
 	// instatantiate controllers
 	staticC := controller.NewStatic()
 	userC := controller.NewUser(services.User)
+	galleryC := controller.NewGallery(services.Gallery)
 
 	// // routing
 	r := mux.NewRouter()
@@ -41,6 +42,8 @@ func main() {
 
 	r.Handle("/login", userC.LoginView).Methods("GET")
 	r.HandleFunc("/login", userC.Login).Methods("POST")
+
+	r.Handle("/gallery/new", galleryC.NewView).Methods("GET")
 
 	r.HandleFunc("/cookietest", userC.CookieTest).Methods("GET")
 
