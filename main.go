@@ -44,6 +44,7 @@ func main() {
 	r.HandleFunc("/login", userC.Login).Methods("POST")
 
 	r.Handle("/gallery/new", galleryC.NewView).Methods("GET")
+	r.HandleFunc("/gallery", galleryC.Create).Methods("POST")
 
 	r.HandleFunc("/cookietest", userC.CookieTest).Methods("GET")
 
