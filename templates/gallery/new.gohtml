@@ -1,0 +1,16 @@
+{{define "yield"}}
+    <div class="pure-u-1">
+        <h3>Create a Gallery</h3>
+        <form class="pure-form pure-form-aligned" action="/gallery" method="POST">
+            <fieldset>
+                <div class="pure-control-group">
+                    <label for="name">Title</label>
+                    <input type="text" id="title" name="title" placeholder="Title of your gallery" />
+                </div>
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Create</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+{{end}}
