@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -61,7 +60,13 @@ func (g *Gallery) Create(w http.ResponseWriter, r *http.Request) {
 		g.NewView.Render(w, vd)
 		return
 	}
-	fmt.Fprintln(w, gallery)
+
+	url, err := g.r.Get(ShowGallery).URL("id", strconv.Itoa(int(gallery.ID)))
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+	http.Redirect(w, r, url.Path, http.StatusFound)
 }
 
 // Show will display a gallery that matches the provided ID
