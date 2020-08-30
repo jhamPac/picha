@@ -3,7 +3,9 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/jhampac/picha/context"
 	"github.com/jhampac/picha/model"
 	"github.com/jhampac/picha/view"
@@ -54,4 +56,27 @@ func (g *Gallery) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintln(w, gallery)
+}
+
+// Show will display a gallery that matches the provided ID
+func (g *Gallery) Show(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	idStr := vars["id"]
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid gallery ID", http.StatusNotFound)
+		return
+	}
+
+	_ = id
+
+	gallery := model.Gallery{
+		Title: "Temporary fake gallery with ID: " + idStr,
+	}
+
+	var vd view.Data
+	vd.Yield = gallery
+	g.ShowView.Render(w, vd)
 }

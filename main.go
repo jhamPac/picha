@@ -53,6 +53,7 @@ func main() {
 	createGallery := requireUserMw.ApplyFn(galleryC.Create)
 	r.Handle("/gallery/new", newGallery).Methods("GET")
 	r.HandleFunc("/gallery", createGallery).Methods("POST")
+	r.HandleFunc("/gallery/{id:[0-9]+}", galleryC.Show).Methods("GET")
 
 	r.HandleFunc("/cookietest", userC.CookieTest).Methods("GET")
 
