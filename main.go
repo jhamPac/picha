@@ -28,10 +28,13 @@ func main() {
 	defer services.Close()
 	services.AutoMigrate()
 
+	// mux router
+	r := mux.NewRouter()
+
 	// instatantiate controllers
 	staticC := controller.NewStatic()
 	userC := controller.NewUser(services.User)
-	galleryC := controller.NewGallery(services.Gallery)
+	galleryC := controller.NewGallery(services.Gallery, r)
 
 	// middleware
 	requireUserMw := middleware.RequireUser{
@@ -39,7 +42,6 @@ func main() {
 	}
 
 	// // routing
-	r := mux.NewRouter()
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/contact", staticC.Contact).Methods("GET")
 
@@ -53,7 +55,7 @@ func main() {
 	createGallery := requireUserMw.ApplyFn(galleryC.Create)
 	r.Handle("/gallery/new", newGallery).Methods("GET")
 	r.HandleFunc("/gallery", createGallery).Methods("POST")
-	r.HandleFunc("/gallery/{id:[0-9]+}", galleryC.Show).Methods("GET")
+	r.HandleFunc("/gallery/{id:[0-9]+}", galleryC.Show).Methods("GET").Name(controller.ShowGallery)
 
 	r.HandleFunc("/cookietest", userC.CookieTest).Methods("GET")
 

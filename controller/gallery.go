@@ -11,19 +11,25 @@ import (
 	"github.com/jhampac/picha/view"
 )
 
+const (
+	ShowGallery = "show_gallery"
+)
+
 // Gallery controller for all related resources
 type Gallery struct {
 	NewView  *view.View
 	ShowView *view.View
 	gs       model.GalleryService
+	r        *mux.Router
 }
 
 // NewGallery instantiates a new controller for the gallery resource
-func NewGallery(gs model.GalleryService) *Gallery {
+func NewGallery(gs model.GalleryService, r *mux.Router) *Gallery {
 	return &Gallery{
 		NewView:  view.New("appcontainer", "gallery/new"),
 		ShowView: view.New("appcontainer", "gallery/show"),
 		gs:       gs,
+		r:        r,
 	}
 }
 
