@@ -5,7 +5,6 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Picha</title>
-        <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css" integrity="sha384-cg6SkqEOCV1NbJoCu11+bm0NvBRc8IYLRGXkmNrqUBfTjmMYwNKPWBTIKyw9mHNJ" crossorigin="anonymous">
         <style>
             main {
                 padding: 15px;
@@ -47,10 +46,10 @@
         </style>
     </head>
     <body>
-        <nav class="pure-g">
+        <nav>
             {{template "navbar"}}
         </nav>
-        <main class="pure-g">
+        <main>
             {{if .Alert}}
                 {{template "alert" .Alert}}
             {{end}}
