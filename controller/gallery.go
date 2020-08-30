@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/jhampac/picha/context"
 	"github.com/jhampac/picha/model"
 	"github.com/jhampac/picha/view"
 )
@@ -38,8 +39,11 @@ func (g *Gallery) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user := context.User(r.Context())
+
 	gallery := model.Gallery{
-		Title: form.Title,
+		Title:  form.Title,
+		UserID: user.ID,
 	}
 
 	if err := g.gs.Create(&gallery); err != nil {
