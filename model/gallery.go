@@ -21,6 +21,7 @@ type GalleryService interface {
 
 // GalleryDB is the DB connection for galleries
 type GalleryDB interface {
+	ByID(id uint) (*Gallery, error)
 	Create(gallery *Gallery) error
 }
 
@@ -59,6 +60,16 @@ func (gv *galleryValidator) Create(gallery *Gallery) error {
 
 func (gg *galleryGorm) Create(gallery *Gallery) error {
 	return gg.db.Create(gallery).Error
+}
+
+func (gg *galleryGorm) ByID(id uint) (*Gallery, error) {
+	var gallery Gallery
+	db := gg.db.Where("id = ?", id)
+	err := first(db, &gallery)
+	if err != nil {
+		return nil, err
+	}
+	return &gallery, nil
 }
 
 type galleryValFn func(*Gallery) error
