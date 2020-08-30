@@ -61,19 +61,22 @@ func (g *Gallery) Create(w http.ResponseWriter, r *http.Request) {
 // Show will display a gallery that matches the provided ID
 func (g *Gallery) Show(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-
 	idStr := vars["id"]
-
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "Invalid gallery ID", http.StatusNotFound)
 		return
 	}
 
-	_ = id
-
-	gallery := model.Gallery{
-		Title: "Temporary fake gallery with ID: " + idStr,
+	gallery, err := g.gs.ByID(uint(id))
+	if err != nil {
+		switch err {
+		case model.ErrNotFound:
+			http.Error(w, "Gallery not found", http.StatusNotFound)
+		default:
+			http.Error(w, "Uh oh! something went wrong", http.StatusInternalServerError)
+		}
+		return
 	}
 
 	var vd view.Data
