@@ -1,0 +1,12 @@
+{{define "yield"}}
+    <div>
+        <h3>Edit your gallery</h3>
+        <form action="/gallery/{{.ID}}/update" method="POST">
+            <div>
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title" placeholder="What is the new title of your gallery?" value="{{.Title}}">
+            </div>
+            <button type="submit">Update</button>
+        </form>
+    </div>
+{{end}}

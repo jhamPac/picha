@@ -18,6 +18,7 @@ const (
 type Gallery struct {
 	NewView  *view.View
 	ShowView *view.View
+	EditView *view.View
 	gs       model.GalleryService
 	r        *mux.Router
 }
@@ -27,6 +28,7 @@ func NewGallery(gs model.GalleryService, r *mux.Router) *Gallery {
 	return &Gallery{
 		NewView:  view.New("appcontainer", "gallery/new"),
 		ShowView: view.New("appcontainer", "gallery/show"),
+		EditView: view.New("appcontainer", "gallery/edit"),
 		gs:       gs,
 		r:        r,
 	}
@@ -71,12 +73,38 @@ func (g *Gallery) Create(w http.ResponseWriter, r *http.Request) {
 
 // Show will display a gallery that matches the provided ID
 func (g *Gallery) Show(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+	var vd view.Data
+	vd.Yield = gallery
+	g.ShowView.Render(w, vd)
+}
+
+// Edit a users gallery
+func (g *Gallery) Edit(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "You do not have permissions to edit this gallery", http.StatusForbidden)
+		return
+	}
+	var vd view.Data
+	vd.Yield = gallery
+	g.EditView.Render(w, vd)
+}
+
+func (g *Gallery) galleryByID(w http.ResponseWriter, r *http.Request) (*model.Gallery, error) {
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "Invalid gallery ID", http.StatusNotFound)
-		return
+		return nil, err
 	}
 
 	gallery, err := g.gs.ByID(uint(id))
@@ -87,10 +115,7 @@ func (g *Gallery) Show(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.Error(w, "Uh oh! something went wrong", http.StatusInternalServerError)
 		}
-		return
+		return nil, err
 	}
-
-	var vd view.Data
-	vd.Yield = gallery
-	g.ShowView.Render(w, vd)
+	return gallery, nil
 }
