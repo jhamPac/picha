@@ -98,6 +98,40 @@ func (g *Gallery) Edit(w http.ResponseWriter, r *http.Request) {
 	g.EditView.Render(w, vd)
 }
 
+// Update POST /gallery/:id/update
+func (g *Gallery) Update(w http.ResponseWriter, r *http.Request) {
+	// retrieve the gallery by ID and the user from the context
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "Gallery not found", http.StatusNotFound)
+		return
+	}
+
+	// parse form from the edit POST call
+	var vd view.Data
+	vd.Yield = gallery
+	var form GalleryForm
+	if err := parseForm(&form, r); err != nil {
+		vd.SetAlert(err)
+		g.EditView.Render(w, vd)
+		return
+	}
+
+	// update the gallery
+	gallery.Title = form.Title
+
+	// notify the user of the update
+	vd.Alert = &view.Alert{
+		Level:   view.AlertLvlSuccess,
+		Message: "Gallery updated successfully!",
+	}
+	g.EditView.Render(w, vd)
+}
+
 func (g *Gallery) galleryByID(w http.ResponseWriter, r *http.Request) (*model.Gallery, error) {
 	vars := mux.Vars(r)
 	idStr := vars["id"]
