@@ -6,9 +6,9 @@
                 <label for="title">Title</label>
                 <input type="text" name="title" id="title" placeholder="What is the new title of your gallery?" value="{{.Title}}">
             </div>
-            <button type="submit">Update</button>
+            <button style="margin-top:16px;" type="submit">Update</button>
         </form>
-        <form action="/gallery/{{.ID}}/delete" method="POST">
+        <form action="/gallery/{{.ID}}/delete" method="POST" style="margin-top:16px;">
             <button type="submit">Delete</button>
         </form>
     </div>
