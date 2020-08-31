@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -98,7 +99,7 @@ func (g *Gallery) Edit(w http.ResponseWriter, r *http.Request) {
 	g.EditView.Render(w, vd)
 }
 
-// Update POST /gallery/:id/update
+// Update a gallery resource: POST /gallery/:id/update
 func (g *Gallery) Update(w http.ResponseWriter, r *http.Request) {
 	// retrieve the gallery by ID and the user from the context
 	gallery, err := g.galleryByID(w, r)
@@ -133,6 +134,30 @@ func (g *Gallery) Update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	g.EditView.Render(w, vd)
+}
+
+// Delete a gallery resource: POST /gallery/:id/delete
+func (g *Gallery) Delete(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "You do not have permission to edit this gallery", http.StatusForbidden)
+		return
+	}
+
+	var vd view.Data
+	err = g.gs.Delete(gallery.ID)
+	if err != nil {
+		vd.SetAlert(err)
+		vd.Yield = gallery
+		g.EditView.Render(w, vd)
+	}
+
+	fmt.Fprintln(w, "successfully deleted!")
 }
 
 func (g *Gallery) galleryByID(w http.ResponseWriter, r *http.Request) (*model.Gallery, error) {
