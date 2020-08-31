@@ -8,5 +8,8 @@
             </div>
             <button type="submit">Update</button>
         </form>
+        <form action="/gallery/{{.ID}}/delete" method="POST">
+            <button type="submit">Delete</button>
+        </form>
     </div>
 {{end}}
